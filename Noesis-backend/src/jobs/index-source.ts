@@ -126,10 +126,15 @@ export async function indexSource(sourceId: string): Promise<void> {
     }));
 
     // Delete any existing chunks if re-indexing, then bulk insert
-    await db.$transaction([
-      db.chunk.deleteMany({ where: { sourceId } }),
-      db.chunk.createMany({ data: prismaChunksData }),
-    ]);
+    await db.$transaction(
+      [
+        db.chunk.deleteMany({ where: { sourceId } }),
+        db.chunk.createMany({ data: prismaChunksData }),
+      ],
+      {
+        timeout: 120000,
+      }
+    );
 
     // Complete source status update
     await db.source.update({
