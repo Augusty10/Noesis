@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { Plus, ArrowLeft, MessageSquare, Radio, Compass } from "lucide-react";
+import { Plus, ArrowLeft, MessageSquare, Radio, Compass, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useSources } from "@/hooks/useSources";
 import SourceList from "@/components/sources/SourceList";
@@ -22,13 +22,36 @@ export default function NotebookWorkspacePage() {
   const [selectedSource, setSelectedSource] = useState<Source | null>(null);
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
   const [activeTab, setActiveTab] = useState<"chat" | "podcast" | "roadmap">("chat");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const hasReadySources = sources.some((s) => s.status === "READY");
 
   return (
-    <div className="flex flex-1 min-h-0">
+    <div className="flex flex-1 min-h-0 relative overflow-hidden">
+      {/* Backdrop overlay for mobile sidebar */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-30 lg:hidden" 
+          onClick={() => setSidebarOpen(false)} 
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-[240px] border-r border-border bg-surface1 flex flex-col p-3 gap-3">
+      <aside className={`
+        fixed inset-y-0 left-0 z-40 w-[240px] border-r border-border bg-surface1 flex flex-col p-3 gap-3 
+        transition-transform duration-300 ease-in-out lg:static lg:translate-x-0
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+      `}>
+        <div className="flex items-center justify-between lg:hidden border-b border-border pb-2 px-1">
+          <span className="text-xs font-semibold text-textPrimary">Sources</span>
+          <button 
+            onClick={() => setSidebarOpen(false)} 
+            className="text-textMuted hover:text-textPrimary cursor-pointer"
+            aria-label="Close sidebar"
+          >
+            <X size={15} />
+          </button>
+        </div>
         <Link href="/notebooks" className="flex items-center gap-1.5 text-xs text-textMuted hover:text-textPrimary px-1">
           <ArrowLeft size={13} /> All notebooks
         </Link>
@@ -68,7 +91,14 @@ export default function NotebookWorkspacePage() {
       {/* Main Workspace Section */}
       <div className="flex-1 flex flex-col min-h-0 bg-bg">
         {/* Workspace Tab Bar */}
-        <div className="flex border-b border-border bg-surface1 px-6 h-12 items-center gap-6 shrink-0">
+        <div className="flex border-b border-border bg-surface1 px-4 lg:px-6 h-12 items-center gap-4 lg:gap-6 shrink-0">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden p-1.5 text-textMuted hover:text-textPrimary rounded-md hover:bg-surface2 transition-colors cursor-pointer"
+            title="Toggle sources"
+          >
+            <Menu size={16} />
+          </button>
           <button
             onClick={() => setActiveTab("chat")}
             className={`flex items-center gap-1.5 text-xs font-semibold h-full px-1 border-b-2 transition-all cursor-pointer ${

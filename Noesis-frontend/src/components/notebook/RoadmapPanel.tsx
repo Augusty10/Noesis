@@ -84,7 +84,7 @@ export default function RoadmapPanel({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-auto p-6 gap-6">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-4 gap-4 sm:gap-2">
         <div>
           <h2 className="text-base font-semibold text-textPrimary flex items-center gap-2">
             <Compass size={18} className="text-greenBright" /> Learning Roadmap

@@ -34,7 +34,7 @@ export default function SourceViewerPanel({ citation, onClose }: SourceViewerPan
 
   if (!citation) {
     return (
-      <div className="w-[300px] border-l border-border bg-surface1 flex items-center justify-center p-6">
+      <div className="hidden lg:flex lg:w-[300px] border-l border-border bg-surface1 flex items-center justify-center p-6">
         <p className="text-xs text-textMuted text-center">
           Click a citation number in an answer to view its original source here.
         </p>
@@ -43,7 +43,13 @@ export default function SourceViewerPanel({ citation, onClose }: SourceViewerPan
   }
 
   return (
-    <div className="w-[300px] border-l border-border bg-surface1 flex flex-col">
+    <>
+      {/* Backdrop overlay for mobile view when a citation is active */}
+      <div 
+        className="fixed inset-0 bg-black/60 z-30 lg:hidden" 
+        onClick={onClose} 
+      />
+      <div className="fixed inset-y-0 right-0 z-40 w-[320px] max-w-[90vw] border-l border-border bg-surface1 flex flex-col lg:static lg:w-[300px]">
       <div className="flex items-start justify-between px-4 py-3 border-b border-border">
         <div>
           <p className="text-xs font-medium text-textPrimary truncate max-w-[220px]">{citation.sourceTitle}</p>
@@ -78,5 +84,6 @@ export default function SourceViewerPanel({ citation, onClose }: SourceViewerPan
         )}
       </div>
     </div>
+    </>
   );
 }
