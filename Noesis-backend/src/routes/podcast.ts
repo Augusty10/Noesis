@@ -110,27 +110,46 @@ Write about 8-12 dialogue lines. Ensure there is no additional introductory or c
     let warning: string | undefined;
 
     try {
-      const audioBuffers: Buffer[] = [];
+      // Create a flat array of all text parts to synthesize, keeping track of their order
+      const tasks: { text: string; lang: string; index: number }[] = [];
+      let partIndex = 0;
 
       for (const line of script) {
         const lang = line.speaker === "Lisa" ? "en-GB" : "en-US";
-        
-        // Split line text into 180-character chunks (Google TTS limit is 200 characters)
         const textParts = splitTextIntoParts(line.text, 180);
-
         for (const part of textParts) {
-          const base64 = await googleTTS.getAudioBase64(part, {
+          tasks.push({
+            text: part,
             lang,
+            index: partIndex++,
+          });
+        }
+      }
+
+      const audioBuffers: Buffer[] = new Array(tasks.length);
+      const limit = 5;
+      let nextTaskIndex = 0;
+
+      async function worker() {
+        while (nextTaskIndex < tasks.length) {
+          const currentTaskIndex = nextTaskIndex++;
+          const task = tasks[currentTaskIndex];
+          const base64 = await googleTTS.getAudioBase64(task.text, {
+            lang: task.lang,
             slow: false,
             host: "https://translate.google.com",
             timeout: 8000,
           });
-          audioBuffers.push(Buffer.from(base64, "base64"));
+          audioBuffers[currentTaskIndex] = Buffer.from(base64, "base64");
         }
-
-        // Add a tiny silence buffer between speakers (optional, but 100ms silence helps natural flow)
-        // A simple raw 100ms MP3 silence frame or just simple concatenation
       }
+
+      // Start up to 'limit' concurrent workers
+      const workers: Promise<void>[] = [];
+      for (let i = 0; i < Math.min(limit, tasks.length); i++) {
+        workers.push(worker());
+      }
+      await Promise.all(workers);
 
       // Concatenate all MP3 buffers
       const finalBuffer = Buffer.concat(audioBuffers);

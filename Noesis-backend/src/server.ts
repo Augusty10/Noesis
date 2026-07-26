@@ -1,13 +1,14 @@
+import path from "path";
+import dotenv from "dotenv";
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import notebookRouter from "./routes/notebook";
 import sourcesRouter from "./routes/sources";
 import queryRouter from "./routes/query";
 import podcastRouter from "./routes/podcast";
 import roadmapRouter from "./routes/roadmap";
-
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;

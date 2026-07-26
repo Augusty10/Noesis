@@ -1,5 +1,9 @@
+import path from "path";
+import dotenv from "dotenv";
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+
 import { PrismaClient } from "@prisma/client";
-import { Pool, neonConfig } from "@neondatabase/serverless";
+import { neonConfig } from "@neondatabase/serverless";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import ws from "ws";
 
@@ -8,26 +12,40 @@ neonConfig.webSocketConstructor = ws;
 
 declare global {
   var prisma: PrismaClient | undefined;
+  var prismaConnStr: string | undefined;
 }
 
 let prismaClientInstance: PrismaClient;
 
-const connectionString = process.env.DATABASE_URL || "";
+let connectionString = (process.env.DATABASE_URL || "").trim();
+if (connectionString.startsWith('"') && connectionString.endsWith('"')) {
+  connectionString = connectionString.slice(1, -1);
+}
+if (connectionString.startsWith("'") && connectionString.endsWith("'")) {
+  connectionString = connectionString.slice(1, -1);
+}
+
+const isPlaceholder = !connectionString || connectionString.includes("placeholder") || connectionString.includes("your-neon-db-hostname");
 
 if (process.env.NODE_ENV === "production") {
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaNeon(pool);
+  const adapter = new PrismaNeon({ connectionString });
   prismaClientInstance = new PrismaClient({ adapter });
 } else {
-  // Use global client to avoid pool leak during development hot-reloads
-  if (!global.prisma) {
-    // If connection string is missing during initial CLI prisma generate steps, fallback to mock/local format to avoid constructor crash
+  // Recreate client if connection string changes or is not initialized
+  if (!global.prisma || global.prismaConnStr !== connectionString || isPlaceholder) {
+    console.log("[db.ts] Initializing PrismaClient. Connection string length:", connectionString.length);
     const conn = connectionString || "postgresql://placeholder:placeholder@localhost:5432/neondb?sslmode=require";
-    const pool = new Pool({ connectionString: conn });
-    const adapter = new PrismaNeon(pool);
+    const adapter = new PrismaNeon({ connectionString: conn });
     global.prisma = new PrismaClient({ adapter });
+    global.prismaConnStr = connectionString;
   }
   prismaClientInstance = global.prisma;
 }
 
-export const db = prismaClientInstance;
+// Export a Proxy to prevent stale module-caching reference issues in routes during development hot-reloads
+export const db = new Proxy<PrismaClient>({} as PrismaClient, {
+  get(target, prop) {
+    const instance = global.prisma || prismaClientInstance;
+    return (instance as any)[prop];
+  }
+});

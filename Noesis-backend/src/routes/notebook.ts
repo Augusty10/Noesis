@@ -6,6 +6,7 @@ const router = Router();
 // GET /api/notebooks
 router.get("/", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    console.log("[GET /api/notebooks] process.env.DATABASE_URL =", process.env.DATABASE_URL ? `${process.env.DATABASE_URL.slice(0, 30)}...` : "UNDEFINED");
     const notebooks = await db.notebook.findMany({
       orderBy: { createdAt: "desc" },
       include: {
@@ -33,7 +34,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction): Promise
 // GET /api/notebooks/:id (used to get individual notebook title and status)
 router.get("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const notebook = await db.notebook.findUnique({
       where: { id },
       include: {
@@ -97,7 +98,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction): Promis
 // PATCH /api/notebooks/:id
 router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { title } = req.body;
     if (!title || typeof title !== "string") {
       res.status(400).json({ message: "Title is required and must be a string." });
@@ -129,7 +130,7 @@ router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Pr
 // DELETE /api/notebooks/:id
 router.delete("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     await db.notebook.delete({ where: { id } });
     res.status(204).end();
   } catch (err) {

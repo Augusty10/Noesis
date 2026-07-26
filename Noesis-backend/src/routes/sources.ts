@@ -30,7 +30,7 @@ const upload = multer({ storage });
 // GET /api/notebooks/:notebookId/sources
 router.get("/notebooks/:notebookId/sources", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { notebookId } = req.params;
+    const notebookId = req.params.notebookId as string;
     const sources = await db.source.findMany({
       where: { notebookId },
       orderBy: { createdAt: "desc" },
@@ -52,7 +52,7 @@ router.get("/notebooks/:notebookId/sources", async (req: Request, res: Response,
 });
 
 // POST /api/sources
-router.post("/", upload.single("file"), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/sources", upload.single("file"), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { notebookId, type, title, content, url } = req.body;
 
@@ -160,9 +160,9 @@ router.post("/", upload.single("file"), async (req: Request, res: Response, next
 });
 
 // GET /api/sources/:id
-router.get("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/sources/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const source = await db.source.findUnique({ where: { id } });
     if (!source) {
       res.status(404).json({ message: "Source not found." });
@@ -175,9 +175,9 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction): Prom
 });
 
 // DELETE /api/sources/:id
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.delete("/sources/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const source = await db.source.findUnique({ where: { id } });
     if (!source) {
       res.status(404).json({ message: "Source not found." });
@@ -201,9 +201,9 @@ router.delete("/:id", async (req: Request, res: Response, next: NextFunction): P
 });
 
 // POST /api/sources/:id/reindex
-router.post("/:id/reindex", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/sources/:id/reindex", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const source = await db.source.findUnique({ where: { id } });
     if (!source) {
       res.status(404).json({ message: "Source not found." });
@@ -230,9 +230,9 @@ router.post("/:id/reindex", async (req: Request, res: Response, next: NextFuncti
 });
 
 // GET /api/sources/:id/file (serves uploaded files directly like PDF)
-router.get("/:id/file", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/sources/:id/file", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const source = await db.source.findUnique({ where: { id } });
     if (!source || !source.filePath) {
       res.status(404).json({ message: "File not found." });
@@ -251,9 +251,9 @@ router.get("/:id/file", async (req: Request, res: Response, next: NextFunction):
 });
 
 // GET /api/sources/:id/view
-router.get("/:id/view", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/sources/:id/view", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { chunkId } = req.query;
 
     const source = await db.source.findUnique({

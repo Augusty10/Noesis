@@ -116,22 +116,20 @@ export async function indexSource(sourceId: string): Promise<void> {
     }
 
     // 3. Storing phase
-    const prismaChunks = chunksToEmbed.map((chunk, idx) => {
-      return db.chunk.create({
-        data: {
-          sourceId,
-          text: chunk.text,
-          page: chunk.page,
-          startTime: chunk.startTime,
-          endTime: chunk.endTime,
-          embedding: JSON.stringify(embeddings[idx]),
-        },
-      });
-    });
+    const prismaChunksData = chunksToEmbed.map((chunk, idx) => ({
+      sourceId,
+      text: chunk.text,
+      page: chunk.page,
+      startTime: chunk.startTime,
+      endTime: chunk.endTime,
+      embedding: JSON.stringify(embeddings[idx]),
+    }));
 
-    // Delete any existing chunks if re-indexing
-    await db.chunk.deleteMany({ where: { sourceId } });
-    await db.$transaction(prismaChunks);
+    // Delete any existing chunks if re-indexing, then bulk insert
+    await db.$transaction([
+      db.chunk.deleteMany({ where: { sourceId } }),
+      db.chunk.createMany({ data: prismaChunksData }),
+    ]);
 
     // Complete source status update
     await db.source.update({

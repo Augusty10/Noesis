@@ -1,5 +1,5 @@
 import fs from "fs";
-import pdfParse from "pdf-parse";
+import pdfParse = require("pdf-parse");
 
 export interface PdfPageContent {
   text: string;
@@ -38,16 +38,16 @@ export async function extractPdf(filePath: string): Promise<PdfPageContent[]> {
   };
 
   try {
-    await pdfParse(dataBuffer, { pagerender });
+    await (pdfParse as any)(dataBuffer, { pagerender });
   } catch (error) {
     // If the hook fails or standard parser encounters issues, try basic parsing as fallback
-    const result = await pdfParse(dataBuffer);
+    const result = await (pdfParse as any)(dataBuffer);
     const rawText = result.text || "";
     
     // Split by form-feed character which pdf-parse uses to separate pages
     const parts = rawText.split(/\f/);
     if (parts.length > 1) {
-      return parts.map((part, idx) => ({
+      return parts.map((part: string, idx: number) => ({
         text: part.trim(),
         page: idx + 1,
       }));
