@@ -106,19 +106,19 @@ export default function NotebookWorkspacePage() {
 
         {/* Dynamic Panels */}
         <div className="flex-1 flex flex-col min-h-0">
-          {activeTab === "chat" && (
+          <div className={activeTab === "chat" ? "flex-1 flex flex-col min-h-0" : "hidden"}>
             <ChatPanel
               notebookId={notebookId}
               hasReadySources={hasReadySources}
               onCitationClick={setActiveCitation}
             />
-          )}
-          {activeTab === "podcast" && (
+          </div>
+          <div className={activeTab === "podcast" ? "flex-1 flex flex-col min-h-0" : "hidden"}>
             <PodcastPanel notebookId={notebookId} />
-          )}
-          {activeTab === "roadmap" && (
+          </div>
+          <div className={activeTab === "roadmap" ? "flex-1 flex flex-col min-h-0" : "hidden"}>
             <RoadmapPanel notebookId={notebookId} onCitationClick={setActiveCitation} />
-          )}
+          </div>
         </div>
       </div>
 

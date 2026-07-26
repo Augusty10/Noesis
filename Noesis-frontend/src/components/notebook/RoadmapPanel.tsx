@@ -66,17 +66,17 @@ export default function RoadmapPanel({
   }
 
   function handleReferenceClick(ref: Reference) {
-    // Compile interactive citation target for sidebar preview highlights
+    const isPdf = ref.timestampText.toLowerCase().includes("page");
     const citation: Citation = {
       marker: ref.timestampText,
       chunkId: ref.chunkId || "view",
       sourceId: ref.sourceId,
       sourceTitle: ref.sourceTitle,
-      sourceType: ref.startTime !== null ? "YOUTUBE" : "PDF",
+      sourceType: isPdf ? "PDF" : "YOUTUBE",
       snippet: `Roadmap topic matching reference: ${ref.timestampText}`,
       location: {
-        startTime: ref.startTime !== null ? ref.startTime : undefined,
-        page: ref.startTime !== null ? undefined : (ref.startTime || undefined),
+        startTime: !isPdf && ref.startTime !== null ? ref.startTime : undefined,
+        page: isPdf && ref.startTime !== null ? ref.startTime : undefined,
       },
     };
     onCitationClick(citation);
