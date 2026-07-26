@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
-// Worker must be served from a static path in production — copy from
-// node_modules/pdfjs-dist/build/pdf.worker.min.js into /public.
-pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface PdfViewerProps {
   fileUrl: string;

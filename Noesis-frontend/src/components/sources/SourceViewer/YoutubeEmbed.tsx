@@ -15,7 +15,7 @@ export default function YoutubeEmbed({ videoId, startTime = 0 }: YoutubeEmbedPro
       <div className="aspect-video w-full rounded-md overflow-hidden border border-border">
         <iframe
           className="w-full h-full"
-          src={`https://www.youtube.com/embed/${videoId}?start=${Math.floor(startTime)}`}
+          src={`https://www.youtube-nocookie.com/embed/${videoId}?start=${Math.floor(startTime)}`}
           title="Cited YouTube source"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
