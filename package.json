@@ -9,6 +9,10 @@
   "scripts": {
     "frontend": "npm run dev --workspace=Noesis-frontend",
     "backend": "npm run dev --workspace=Noesis-backend",
-    "install:all": "npm install --workspaces"
+    "install:all": "npm install --workspaces",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
