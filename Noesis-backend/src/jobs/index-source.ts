@@ -105,15 +105,40 @@ export async function indexSource(sourceId: string): Promise<void> {
     // 2. Embedding phase
     await db.source.update({ where: { id: sourceId }, data: { status: "EMBEDDING" } });
 
-    const batchSize = 100;
+    const batchSize = 250; // Increased from 100 to 250 to reduce HTTP request count
     const texts = chunksToEmbed.map((c) => c.text);
-    const embeddings: number[][] = [];
+    const embeddings: number[][] = new Array(texts.length);
 
+    // Create batches of chunks
+    const batches: { start: number; items: string[] }[] = [];
     for (let i = 0; i < texts.length; i += batchSize) {
-      const batch = texts.slice(i, i + batchSize);
-      const batchEmbeddings = await getEmbeddingsBatch(batch);
-      embeddings.push(...batchEmbeddings);
+      const end = Math.min(i + batchSize, texts.length);
+      batches.push({
+        start: i,
+        items: texts.slice(i, end),
+      });
     }
+
+    // Process batches in parallel with a concurrency limit of 5
+    const limit = 5;
+    let nextBatchIndex = 0;
+
+    async function worker() {
+      while (nextBatchIndex < batches.length) {
+        const currentBatchIndex = nextBatchIndex++;
+        const batch = batches[currentBatchIndex];
+        const batchEmbeddings = await getEmbeddingsBatch(batch.items);
+        for (let j = 0; j < batchEmbeddings.length; j++) {
+          embeddings[batch.start + j] = batchEmbeddings[j];
+        }
+      }
+    }
+
+    const workers: Promise<void>[] = [];
+    for (let i = 0; i < Math.min(limit, batches.length); i++) {
+      workers.push(worker());
+    }
+    await Promise.all(workers);
 
     // 3. Storing phase
     const prismaChunksData = chunksToEmbed.map((chunk, idx) => ({
