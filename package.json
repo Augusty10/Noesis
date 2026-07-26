@@ -1,0 +1,14 @@
+{
+  "name": "noesis",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "Noesis-frontend",
+    "Noesis-backend"
+  ],
+  "scripts": {
+    "frontend": "npm run dev --workspace=Noesis-frontend",
+    "backend": "npm run dev --workspace=Noesis-backend",
+    "install:all": "npm install --workspaces"
+  }
+}
