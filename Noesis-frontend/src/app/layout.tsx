@@ -3,7 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Noesis — AI Research Assistant",
+  title: "Provenance — AI Research Assistant",
   description: "Ask questions grounded in your own sources, with citations for every answer.",
 };
 

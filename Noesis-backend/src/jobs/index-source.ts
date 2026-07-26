@@ -75,7 +75,11 @@ export async function indexSource(sourceId: string): Promise<void> {
       updatedTitle = yt.title;
       await db.source.update({
         where: { id: sourceId },
-        data: { status: "CHUNKING", title: updatedTitle },
+        data: {
+          status: "CHUNKING",
+          title: updatedTitle,
+          metadata: JSON.stringify({ videoId: yt.videoId }),
+        },
       });
       const cues = chunkCues(yt.cues);
       chunksToEmbed = cues.map((c) => ({

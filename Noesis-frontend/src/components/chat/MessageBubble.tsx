@@ -17,7 +17,7 @@ interface MessageBubbleProps {
  * clickable inline citations.
  */
 function toMarkdownWithCitationLinks(content: string) {
-  return content.replace(/\[S(\d+)\]/g, (_, n) => `[${n}](citation:S${n})`);
+  return content.replace(/\[S(\d+)\]/g, (_, n) => `[${n}](#citation-S${n})`);
 }
 
 export default function MessageBubble({ message, onCitationClick }: MessageBubbleProps) {
@@ -36,12 +36,13 @@ export default function MessageBubble({ message, onCitationClick }: MessageBubbl
       {isUser ? (
         <p>{message.content}</p>
       ) : (
-        <div className="prose-noesis">
+        <div className="prose-provenance">
           <ReactMarkdown
             components={{
               a: ({ href, children }) => {
-                if (href?.startsWith("citation:")) {
-                  const marker = href.replace("citation:", "");
+                const citationMatch = href?.match(/#citation-S(\d+)/);
+                if (citationMatch) {
+                  const marker = `S${citationMatch[1]}`;
                   const citation = citationByMarker.get(marker);
                   return (
                     <CitationBadge

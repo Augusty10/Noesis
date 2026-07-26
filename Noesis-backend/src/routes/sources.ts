@@ -284,8 +284,17 @@ router.get("/sources/:id/view", async (req: Request, res: Response, next: NextFu
       payload.filePath = `/api/sources/${source.id}/file`;
     }
 
-    if (source.type === "YOUTUBE" && source.originalUrl) {
-      payload.videoId = extractVideoId(source.originalUrl) || undefined;
+    if (source.type === "YOUTUBE") {
+      let videoId = extractVideoId(source.originalUrl || "");
+      if (!videoId && source.metadata) {
+        try {
+          const meta = JSON.parse(source.metadata);
+          if (meta.videoId) {
+            videoId = meta.videoId;
+          }
+        } catch (_) {}
+      }
+      payload.videoId = videoId || undefined;
     }
 
     // If a chunkId was referenced in the citation, load its specific details and highlight text

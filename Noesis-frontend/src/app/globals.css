@@ -41,20 +41,20 @@ body {
 }
 
 /* simple markdown output styling for chat answers */
-.prose-noesis p {
+.prose-provenance p {
   margin-bottom: 0.6em;
 }
-.prose-noesis ul,
-.prose-noesis ol {
+.prose-provenance ul,
+.prose-provenance ol {
   margin: 0.4em 0 0.6em 1.2em;
 }
-.prose-noesis code {
+.prose-provenance code {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 1px 5px;
   font-size: 0.9em;
 }
-.prose-noesis strong {
+.prose-provenance strong {
   color: var(--text-primary);
 }
