@@ -4,8 +4,8 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-bg text-center px-6">
-      <div className="w-12 h-12 rounded-lg bg-greenMid border border-greenBright mb-6" />
-      <h1 className="text-2xl font-semibold text-textPrimary mb-3">Provenance</h1>
+      <img src="/logo.png" alt="Noesis Logo" className="w-16 h-16 object-contain mb-6" />
+      <h1 className="text-2xl font-semibold text-textPrimary mb-3">Noesis</h1>
       <p className="text-sm text-textMuted max-w-md mb-8">
         Upload PDFs, articles, YouTube videos, and transcripts into isolated notebooks.
         Ask questions grounded in your sources — every answer comes with a citation

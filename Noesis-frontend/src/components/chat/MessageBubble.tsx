@@ -36,7 +36,7 @@ export default function MessageBubble({ message, onCitationClick }: MessageBubbl
       {isUser ? (
         <p>{message.content}</p>
       ) : (
-        <div className="prose-provenance">
+        <div className="prose-noesis">
           <ReactMarkdown
             components={{
               a: ({ href, children }) => {
