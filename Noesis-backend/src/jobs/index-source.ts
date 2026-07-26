@@ -109,7 +109,7 @@ export async function indexSource(sourceId: string): Promise<void> {
     // 2. Embedding phase
     await db.source.update({ where: { id: sourceId }, data: { status: "EMBEDDING" } });
 
-    const batchSize = 250; // Increased from 100 to 250 to reduce HTTP request count
+    const batchSize = 500; // Increased from 250 to 500 to reduce HTTP request count
     const texts = chunksToEmbed.map((c) => c.text);
     const embeddings: number[][] = new Array(texts.length);
 
