@@ -11,7 +11,7 @@ import podcastRouter from "./routes/podcast";
 import roadmapRouter from "./routes/roadmap";
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5005;
 
 // Enable CORS and JSON body parser
 app.use(cors());

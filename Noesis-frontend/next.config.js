@@ -7,7 +7,7 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    let backendUrl = process.env.BACKEND_API_URL || "http://localhost:5000";
+    let backendUrl = process.env.BACKEND_API_URL || "http://127.0.0.1:5005";
     
     // Ensure the backendUrl starts with http://, https://, or / to prevent Next.js build crash
     if (!backendUrl.startsWith("http://") && !backendUrl.startsWith("https://") && !backendUrl.startsWith("/")) {
