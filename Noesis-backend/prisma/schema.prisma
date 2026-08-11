@@ -10,9 +10,12 @@ generator client {
 model Notebook {
   id        String   @id @default(uuid())
   title     String
+  userId    String?  // Clerk user ID
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sources   Source[]
+
+  @@index([userId])
 }
 
 model Source {

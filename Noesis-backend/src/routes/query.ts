@@ -4,11 +4,13 @@ import { getEmbedding } from "../lib/ingestion/embedder";
 import { retrieveRelevantChunks } from "../lib/rag/retriever";
 import { buildPrompt } from "../lib/rag/prompt-builder";
 import { parseCitations } from "../lib/rag/citation-parser";
+import { requireAuth } from "../middleware/auth";
+import { requireNotebookOwnership } from "../middleware/ownership";
 
 const router = Router();
 
 // POST /api/query - Grounded RAG query answer streaming
-router.post("/", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/", requireAuth, requireNotebookOwnership, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { notebookId, question } = req.body;
 

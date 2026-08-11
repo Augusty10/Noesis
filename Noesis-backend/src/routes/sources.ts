@@ -6,6 +6,8 @@ import { db } from "../lib/db";
 import { indexSource } from "../jobs/index-source";
 import { validateUploadedFile, UploadedFile } from "../lib/security/file-validation";
 import { extractVideoId } from "../lib/ingestion/extractors/youtube";
+import { requireAuth } from "../middleware/auth";
+import { requireNotebookOwnership } from "../middleware/ownership";
 
 const router = Router();
 
@@ -28,7 +30,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // GET /api/notebooks/:notebookId/sources
-router.get("/notebooks/:notebookId/sources", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/notebooks/:notebookId/sources", requireAuth, requireNotebookOwnership, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const notebookId = req.params.notebookId as string;
     const sources = await db.source.findMany({
@@ -52,7 +54,7 @@ router.get("/notebooks/:notebookId/sources", async (req: Request, res: Response,
 });
 
 // POST /api/sources
-router.post("/sources", upload.single("file"), async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/sources", requireAuth, upload.single("file"), requireNotebookOwnership, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { notebookId, type, title, content, url } = req.body;
 
@@ -160,10 +162,12 @@ router.post("/sources", upload.single("file"), async (req: Request, res: Respons
 });
 
 // GET /api/sources/:id
-router.get("/sources/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/sources/:id", requireAuth, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = req.params.id as string;
-    const source = await db.source.findUnique({ where: { id } });
+    const source = await db.source.findFirst({
+      where: { id, notebook: { userId: req.userId } },
+    });
     if (!source) {
       res.status(404).json({ message: "Source not found." });
       return;
@@ -175,10 +179,12 @@ router.get("/sources/:id", async (req: Request, res: Response, next: NextFunctio
 });
 
 // DELETE /api/sources/:id
-router.delete("/sources/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.delete("/sources/:id", requireAuth, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = req.params.id as string;
-    const source = await db.source.findUnique({ where: { id } });
+    const source = await db.source.findFirst({
+      where: { id, notebook: { userId: req.userId } },
+    });
     if (!source) {
       res.status(404).json({ message: "Source not found." });
       return;
@@ -201,10 +207,12 @@ router.delete("/sources/:id", async (req: Request, res: Response, next: NextFunc
 });
 
 // POST /api/sources/:id/reindex
-router.post("/sources/:id/reindex", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/sources/:id/reindex", requireAuth, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = req.params.id as string;
-    const source = await db.source.findUnique({ where: { id } });
+    const source = await db.source.findFirst({
+      where: { id, notebook: { userId: req.userId } },
+    });
     if (!source) {
       res.status(404).json({ message: "Source not found." });
       return;
@@ -230,10 +238,12 @@ router.post("/sources/:id/reindex", async (req: Request, res: Response, next: Ne
 });
 
 // GET /api/sources/:id/file (serves uploaded files directly like PDF)
-router.get("/sources/:id/file", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/sources/:id/file", requireAuth, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = req.params.id as string;
-    const source = await db.source.findUnique({ where: { id } });
+    const source = await db.source.findFirst({
+      where: { id, notebook: { userId: req.userId } },
+    });
     if (!source || !source.filePath) {
       res.status(404).json({ message: "File not found." });
       return;
@@ -251,13 +261,13 @@ router.get("/sources/:id/file", async (req: Request, res: Response, next: NextFu
 });
 
 // GET /api/sources/:id/view
-router.get("/sources/:id/view", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/sources/:id/view", requireAuth, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = req.params.id as string;
     const { chunkId } = req.query;
 
-    const source = await db.source.findUnique({
-      where: { id },
+    const source = await db.source.findFirst({
+      where: { id, notebook: { userId: req.userId } },
       include: {
         chunks: {
           orderBy: { createdAt: "asc" },

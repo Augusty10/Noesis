@@ -1,11 +1,13 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { OpenAI } from "openai";
 import { db } from "../lib/db";
+import { requireAuth } from "../middleware/auth";
+import { requireNotebookOwnership } from "../middleware/ownership";
 
 const router = Router();
 
 // POST /api/roadmap - Generates a structured learning roadmap from the sources
-router.post("/", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/", requireAuth, requireNotebookOwnership, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { notebookId } = req.body;
 

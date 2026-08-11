@@ -4,6 +4,8 @@ import path from "path";
 import fs from "fs";
 import * as googleTTS from "google-tts-api";
 import { db } from "../lib/db";
+import { requireAuth } from "../middleware/auth";
+import { requireNotebookOwnership } from "../middleware/ownership";
 
 const router = Router();
 
@@ -18,7 +20,7 @@ interface ScriptLine {
 }
 
 // POST /api/podcast - Generates the podcast script and synthesizes host voices
-router.post("/", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post("/", requireAuth, requireNotebookOwnership, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { notebookId } = req.body;
 
@@ -171,7 +173,7 @@ Write about 8-12 dialogue lines. Ensure there is no additional introductory or c
 });
 
 // GET /api/podcast/play/:notebookId - Serves generated podcast audio file
-router.get("/play/:notebookId", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get("/play/:notebookId", requireAuth, requireNotebookOwnership, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { notebookId } = req.params;
     const audioFilePath = path.join(podcastDir, `${notebookId}.mp3`);
