@@ -1,9 +1,28 @@
 import type { Notebook, Source, SourceType, SourceViewPayload } from "./types";
 
+async function getAuthHeader(): Promise<Record<string, string>> {
+  if (typeof window !== "undefined" && (window as any).Clerk?.session) {
+    try {
+      const token = await (window as any).Clerk.session.getToken();
+      if (token) {
+        return { Authorization: `Bearer ${token}` };
+      }
+    } catch (e) {
+      console.warn("Failed to retrieve Clerk session token:", e);
+    }
+  }
+  return {};
+}
+
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
+  const authHeaders = await getAuthHeader();
   const res = await fetch(url, {
     ...options,
-    headers: { "Content-Type": "application/json", ...(options?.headers || {}) },
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders,
+      ...(options?.headers || {}),
+    },
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
@@ -48,11 +67,16 @@ export const api = {
       }),
 
     createFile: async (notebookId: string, type: SourceType, file: File) => {
+      const authHeaders = await getAuthHeader();
       const form = new FormData();
       form.append("notebookId", notebookId);
       form.append("type", type);
       form.append("file", file);
-      const res = await fetch("/api/sources", { method: "POST", body: form });
+      const res = await fetch("/api/sources", {
+        method: "POST",
+        headers: { ...authHeaders },
+        body: form,
+      });
       if (!res.ok) throw new Error("Upload failed");
       return res.json() as Promise<Source>;
     },
@@ -80,9 +104,10 @@ export async function streamQuery(
   onError: (err: Error) => void
 ) {
   try {
+    const authHeaders = await getAuthHeader();
     const res = await fetch("/api/query", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders },
       body: JSON.stringify({ notebookId, question }),
     });
     if (!res.ok || !res.body) throw new Error("Query failed");
