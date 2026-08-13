@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
+      clerkJSUrl={process.env.NEXT_PUBLIC_CLERK_JS_URL}
       appearance={{
         variables: {
           colorPrimary: "#4fae7c",

@@ -17,7 +17,7 @@ async function handleRequest(req: NextRequest, params: { path: string[] }) {
       return NextResponse.json({ message: "Unauthorized. Please sign in." }, { status: 401 });
     }
 
-    const backendUrl = process.env.BACKEND_API_URL || "http://127.0.0.1:5005";
+    const backendUrl = process.env.BACKEND_API_URL || "http://127.0.0.1:8080";
     const searchParams = req.nextUrl.search;
     const url = `${backendUrl}/api/${pathStr}${searchParams}`;
     console.log(`[Proxy Handler] Forwarding to: ${url}`);
@@ -45,13 +45,22 @@ async function handleRequest(req: NextRequest, params: { path: string[] }) {
       }
     }
 
-    const response = await fetch(url, {
-      method: req.method,
-      headers,
-      body,
-      // @ts-ignore
-      duplex: 'half',
-    });
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: req.method,
+        headers,
+        body,
+        // @ts-ignore
+        duplex: 'half',
+      });
+    } catch (fetchErr: any) {
+      console.error(`[Proxy Handler] Failed to connect to backend at ${url}:`, fetchErr.message || fetchErr);
+      return NextResponse.json(
+        { message: "Backend server is offline or unreachable." },
+        { status: 503 }
+      );
+    }
 
     console.log(`[Proxy Handler] Backend responded: Status=${response.status}`);
 
