@@ -2,20 +2,25 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse, NextRequest } from "next/server";
 
 async function handleRequest(req: NextRequest, params: { path: string[] }) {
+  const pathStr = params.path ? params.path.join("/") : "";
+  console.log(`[Proxy Handler] Incoming: Method=${req.method} Path=/api/${pathStr}`);
+  
   try {
     const { userId } = await auth();
+    console.log(`[Proxy Handler] Clerk userId:`, userId);
     
     // Check if it is a public endpoint (e.g. webhooks)
-    const pathStr = params.path ? params.path.join("/") : "";
     const isPublic = pathStr.startsWith("webhooks/");
     
     if (!userId && !isPublic) {
+      console.warn(`[Proxy Handler] Unauthorized request to /api/${pathStr} (no userId)`);
       return NextResponse.json({ message: "Unauthorized. Please sign in." }, { status: 401 });
     }
 
     const backendUrl = process.env.BACKEND_API_URL || "http://127.0.0.1:5005";
     const searchParams = req.nextUrl.search;
     const url = `${backendUrl}/api/${pathStr}${searchParams}`;
+    console.log(`[Proxy Handler] Forwarding to: ${url}`);
 
     // Forward standard headers
     const headers = new Headers();
@@ -48,6 +53,8 @@ async function handleRequest(req: NextRequest, params: { path: string[] }) {
       duplex: 'half',
     });
 
+    console.log(`[Proxy Handler] Backend responded: Status=${response.status}`);
+
     const responseHeaders = new Headers();
     response.headers.forEach((value, key) => {
       responseHeaders.set(key, value);
@@ -58,7 +65,7 @@ async function handleRequest(req: NextRequest, params: { path: string[] }) {
       headers: responseHeaders,
     });
   } catch (err: any) {
-    console.error("Proxy error:", err);
+    console.error(`[Proxy Handler] ERROR proxying to /api/${pathStr}:`, err);
     return NextResponse.json({ message: "Internal server error." }, { status: 500 });
   }
 }
