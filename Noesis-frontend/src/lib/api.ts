@@ -1,16 +1,8 @@
 import type { Notebook, Source, SourceType, SourceViewPayload } from "./types";
 
 async function getAuthHeader(): Promise<Record<string, string>> {
-  if (typeof window !== "undefined" && (window as any).Clerk?.session) {
-    try {
-      const token = await (window as any).Clerk.session.getToken();
-      if (token) {
-        return { Authorization: `Bearer ${token}` };
-      }
-    } catch (e) {
-      console.warn("Failed to retrieve Clerk session token:", e);
-    }
-  }
+  // Session cookies (__session) are automatically attached by the browser on same-origin /api calls,
+  // which @clerk/nextjs/server auth() reads in Next.js API proxy route.
   return {};
 }
 

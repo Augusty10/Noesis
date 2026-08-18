@@ -118,7 +118,12 @@ export async function extractYoutube(url: string): Promise<YoutubeContent> {
 
   // 2. Fetch transcript
   try {
-    const transcriptList = await YoutubeTranscript.fetchTranscript(videoId);
+    let transcriptList;
+    try {
+      transcriptList = await YoutubeTranscript.fetchTranscript(videoId);
+    } catch {
+      transcriptList = await YoutubeTranscript.fetchTranscript(videoId, { lang: "en" });
+    }
     const cues = transcriptList.map((item) => {
       // Bulletproof check for milliseconds vs seconds
       // youtube-transcript library might return offset in milliseconds or seconds depending on version
