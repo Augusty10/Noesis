@@ -23,7 +23,7 @@ export function chunkText(
 
   while (start < text.length) {
     let end = start + chunkSize;
-    if (end > text.length) {
+    if (end >= text.length) {
       end = text.length;
     } else {
       // Find sentence boundary or space to avoid cutting words
@@ -43,10 +43,11 @@ export function chunkText(
       });
     }
 
-    start = end - overlap;
-    if (start >= text.length - overlap) {
+    if (end >= text.length) {
       break;
     }
+
+    start = Math.max(start + 1, end - overlap);
   }
 
   return chunks;

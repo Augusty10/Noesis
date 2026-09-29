@@ -154,16 +154,14 @@ export async function indexSource(sourceId: string): Promise<void> {
       embedding: JSON.stringify(embeddings[idx]),
     }));
 
-    // Delete any existing chunks if re-indexing, then bulk insert
-    await db.$transaction(
-      [
-        db.chunk.deleteMany({ where: { sourceId } }),
-        db.chunk.createMany({ data: prismaChunksData }),
-      ],
-      {
-        timeout: 120000,
-      }
-    );
+    // Delete any existing chunks if re-indexing, then bulk insert in batches to prevent query parameter limits
+    await db.chunk.deleteMany({ where: { sourceId } });
+
+    const CHUNK_BATCH_SIZE = 500;
+    for (let i = 0; i < prismaChunksData.length; i += CHUNK_BATCH_SIZE) {
+      const chunkBatch = prismaChunksData.slice(i, i + CHUNK_BATCH_SIZE);
+      await db.chunk.createMany({ data: chunkBatch });
+    }
 
     // Complete source status update
     await db.source.update({

@@ -6,9 +6,12 @@ export interface PdfPageContent {
   page: number;
 }
 
+
 /**
  * Extracts text page-by-page from a PDF file using pdf-parse (v2.x).
  */
+
+
 export async function extractPdf(filePath: string): Promise<PdfPageContent[]> {
   const dataBuffer = fs.readFileSync(filePath);
   const parser = new PDFParse({ data: dataBuffer });
@@ -23,3 +26,4 @@ export async function extractPdf(filePath: string): Promise<PdfPageContent[]> {
     await parser.destroy();
   }
 }
+
