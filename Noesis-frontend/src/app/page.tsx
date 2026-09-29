@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Play, Pause, X, ExternalLink, FileText, CheckCircle2, ChevronRight, Volume2, Sparkles, BookOpen } from "lucide-react";
 
 interface SnippetData {
@@ -327,11 +327,11 @@ export default function LandingPage() {
 
             <SignedOut>
               <Link href="/sign-in" className="gh">
-                Sign In
+                Login
               </Link>
-              <SignUpButton mode="modal">
-                <button className="btn p">Get Started</button>
-              </SignUpButton>
+              <Link href="/sign-in" className="btn p">
+                Get Started
+              </Link>
             </SignedOut>
 
             <SignedIn>
@@ -375,13 +375,11 @@ export default function LandingPage() {
             <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
               <SignedOut>
                 <Link href="/sign-in" className="btn s" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center" }}>
-                  Sign In
+                  Login
                 </Link>
-                <SignUpButton mode="modal">
-                  <button className="btn p" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center", width: "100%" }}>
-                    Get Started Free
-                  </button>
-                </SignUpButton>
+                <Link href="/sign-in" className="btn p" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center", width: "100%" }}>
+                  Get Started
+                </Link>
               </SignedOut>
               <SignedIn>
                 <Link href="/notebooks" className="btn p" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center" }}>
@@ -409,9 +407,9 @@ export default function LandingPage() {
             </p>
             <div className="cta rise d2" style={{ "--d": ".9s" } as React.CSSProperties}>
               <SignedOut>
-                <SignUpButton mode="modal">
-                  <button className="btn p">Get Started Free</button>
-                </SignUpButton>
+                <Link href="/sign-in" className="btn p">
+                  Get Started
+                </Link>
                 <a className="btn w" href="#product">
                   Explore Noesis
                 </a>
@@ -1171,9 +1169,9 @@ export default function LandingPage() {
             <p>Explore Noesis and experience a context-aware way to interact with your sources.</p>
             <div className="cta">
               <SignedOut>
-                <SignUpButton mode="modal">
-                  <button className="btn w">Get Started Free</button>
-                </SignUpButton>
+                <Link href="/sign-in" className="btn w">
+                  Get Started
+                </Link>
                 <a
                   className="btn s"
                   href="https://github.com/Augusty10/Noesis"
@@ -1273,6 +1271,7 @@ export default function LandingPage() {
             <li><a href="#architecture">Architecture</a></li>
             <li><a href="#about">About</a></li>
             <li><Link href="/notebooks">Notebooks</Link></li>
+            <li><Link href="/sign-in">Login</Link></li>
             <li>
               <a
                 href="https://github.com/Augusty10/Noesis#readme"
