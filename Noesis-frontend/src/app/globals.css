@@ -18,6 +18,10 @@
   --danger: #e5484d;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
 }

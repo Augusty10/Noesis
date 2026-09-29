@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
 import { Play, Pause, X, ExternalLink, FileText, CheckCircle2, ChevronRight, Volume2, Sparkles, BookOpen } from "lucide-react";
 
 interface SnippetData {
@@ -325,21 +325,31 @@ export default function LandingPage() {
               GitHub
             </a>
 
-            <SignedOut>
+            <ClerkLoading>
               <Link href="/sign-in" className="gh">
                 Login
               </Link>
               <Link href="/sign-in" className="btn p">
                 Get Started
               </Link>
-            </SignedOut>
+            </ClerkLoading>
+            <ClerkLoaded>
+              <SignedOut>
+                <Link href="/sign-in" className="gh">
+                  Login
+                </Link>
+                <Link href="/sign-in" className="btn p">
+                  Get Started
+                </Link>
+              </SignedOut>
 
-            <SignedIn>
-              <Link href="/notebooks" className="btn p">
-                Go to Notebooks
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
+              <SignedIn>
+                <Link href="/notebooks" className="btn p">
+                  Go to Notebooks
+                </Link>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+            </ClerkLoaded>
 
             <button
               className="burger"
@@ -373,19 +383,29 @@ export default function LandingPage() {
               GitHub Repository ↗
             </a>
             <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
-              <SignedOut>
+              <ClerkLoading>
                 <Link href="/sign-in" className="btn s" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center" }}>
                   Login
                 </Link>
                 <Link href="/sign-in" className="btn p" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center", width: "100%" }}>
                   Get Started
                 </Link>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/notebooks" className="btn p" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center" }}>
-                  Go to Notebooks
-                </Link>
-              </SignedIn>
+              </ClerkLoading>
+              <ClerkLoaded>
+                <SignedOut>
+                  <Link href="/sign-in" className="btn s" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center" }}>
+                    Login
+                  </Link>
+                  <Link href="/sign-in" className="btn p" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center", width: "100%" }}>
+                    Get Started
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <Link href="/notebooks" className="btn p" onClick={() => setMobileOpen(false)} style={{ justifyContent: "center" }}>
+                    Go to Notebooks
+                  </Link>
+                </SignedIn>
+              </ClerkLoaded>
             </div>
           </div>
         )}
@@ -406,22 +426,26 @@ export default function LandingPage() {
               grounded in your sources, and click any citation to see exactly where the answer came from.
             </p>
             <div className="cta rise d2" style={{ "--d": ".9s" } as React.CSSProperties}>
-              <SignedOut>
+              <ClerkLoading>
                 <Link href="/sign-in" className="btn p">
                   Get Started
                 </Link>
-                <a className="btn w" href="#product">
-                  Explore Noesis
-                </a>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/notebooks" className="btn p">
-                  Go to Notebooks
-                </Link>
-                <a className="btn w" href="#features">
-                  Explore Features
-                </a>
-              </SignedIn>
+              </ClerkLoading>
+              <ClerkLoaded>
+                <SignedOut>
+                  <Link href="/sign-in" className="btn p">
+                    Get Started
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <Link href="/notebooks" className="btn p">
+                    Go to Notebooks
+                  </Link>
+                </SignedIn>
+              </ClerkLoaded>
+              <a className="btn w" href="#product">
+                Explore Noesis
+              </a>
             </div>
             <div className="trio rise d2" style={{ "--d": "1s" } as React.CSSProperties}>
               Retrieval · Context · Generation
@@ -1168,16 +1192,29 @@ export default function LandingPage() {
             <h2>Bring your knowledge closer to AI.</h2>
             <p>Explore Noesis and experience a context-aware way to interact with your sources.</p>
             <div className="cta">
-              <SignedOut>
+              <ClerkLoading>
                 <Link href="/sign-in" className="btn w">
                   Get Started
                 </Link>
-                <a
-                  className="btn s"
-                  href="https://github.com/Augusty10/Noesis"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+              </ClerkLoading>
+              <ClerkLoaded>
+                <SignedOut>
+                  <Link href="/sign-in" className="btn w">
+                    Get Started
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <Link href="/notebooks" className="btn w">
+                    Go to Notebooks
+                  </Link>
+                </SignedIn>
+              </ClerkLoaded>
+              <a
+                className="btn s"
+                href="https://github.com/Augusty10/Noesis"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                   View GitHub
                 </a>
               </SignedOut>

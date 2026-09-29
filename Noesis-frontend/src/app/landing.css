@@ -1513,6 +1513,15 @@
   .landing-root .hero {
     padding-top: 120px;
   }
+  .landing-root .hero .cta {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .landing-root .hero .cta .btn {
+    justify-content: center;
+    width: 100%;
+  }
   .landing-root .node {
     min-width: 0;
     width: 100%;
