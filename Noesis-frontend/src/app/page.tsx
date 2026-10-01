@@ -1215,22 +1215,8 @@ export default function LandingPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                  View GitHub
-                </a>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/notebooks" className="btn w">
-                  Go to Notebooks
-                </Link>
-                <a
-                  className="btn s"
-                  href="https://github.com/Augusty10/Noesis"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View GitHub
-                </a>
-              </SignedIn>
+                View GitHub
+              </a>
             </div>
           </div>
         </div>
